@@ -1,11 +1,18 @@
 import {select, isCancel} from "@clack/prompts";
 import chalk from "chalk";
-import figlet from "figlet";
 import { runCliMode } from "../modes/cli";
 import { runTelegramMode } from "../modes/telegram";
 import { ensureOpenRouterConfig, ensureTelegramConfig } from "../config/runtime";
 
-const BANNER_FONT = 'ANSI Shadow';
+const HYPRCLAW_BANNER = `
+ ██╗  ██╗██╗   ██╗██████╗ ██████╗  ██████╗██╗      █████╗ ██╗    ██╗
+ ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██╔════╝██║     ██╔══██╗██║    ██║
+ ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ██║     ███████║██║ █╗ ██║
+ ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██║     ██╔══██║██║███╗██║
+ ██║  ██║   ██║   ██║     ██║  ██║╚██████╗███████╗██║  ██║╚███╔███╔╝
+ ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝ ╚══════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝
+`;
+
 const SHADOW = chalk.hex('#5b4d9e');
 const FACE = chalk.hex('#e8dcf8').bold;
 
@@ -24,14 +31,7 @@ function printBannerwithShadow(ascii: string) {
     console.log();   
 }
 export async function runwakeup() {
-    let ascii:string;
-    try {
-        ascii = figlet.textSync('HyprClaw', { font: BANNER_FONT });
-    } catch (error) {
-        ascii = figlet.textSync("HyprClaw", {font:"Standard"}) 
-    }
-
-    printBannerwithShadow(ascii)
+    printBannerwithShadow(HYPRCLAW_BANNER);
 
     const mode = await select({
         message: "Which mode do you want to proceed with?",
