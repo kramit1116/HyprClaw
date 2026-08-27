@@ -1,6 +1,6 @@
 {
   "name": "hyprclaw",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A terminal and Telegram coding assistant powered by OpenRouter.",
   "type": "module",
   "bin": {
