@@ -1,14 +1,13 @@
 {
   "name": "hyprclaw",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A terminal and Telegram coding assistant powered by OpenRouter.",
   "type": "module",
   "bin": {
-    "hyprclaw": "hyprclaw-cli.js"
+    "hyprclaw": "dist/cli.js"
   },
   "files": [
     "dist",
-    "hyprclaw-cli.js",
     "README.md",
     "LICENSE"
   ],

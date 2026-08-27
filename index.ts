@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+// Suppress punycode deprecation warning
+process.removeAllListeners('warning');
+process.on('warning', (warning: any) => {
+    if (warning.code !== 'DEP0040') {
+        console.warn(warning);
+    }
+});
+
 import { Command } from "commander";
 import { runwakeup } from "./tui/wakeup";
 import { runConfigure } from "./config/runtime";
