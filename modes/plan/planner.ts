@@ -15,19 +15,24 @@ import { defaultAgentConfig } from "../agent/types.ts";
 import type { Plan, PlanStep } from "./types.ts";
 import { createWebTools } from "./web-tools.ts";
 
+// Some providers occasionally call this field `detail` even when asked for
+// `description`. Accept that harmless alias at the API boundary, then
+// normalize it to the PlanStep shape used by the rest of the app.
+const planStepSchema = z
+  .object({
+    title: z.string(),
+    description: z.string().optional(),
+    detail: z.string().optional(),
+    hints: z.array(z.string()).optional(),
+    complexity: z.enum(["low", "medium", "high"]).optional(),
+  })
+  .refine((step) => step.description !== undefined || step.detail !== undefined, {
+    message: "Each step must include a description.",
+  });
+
 const planSchema = z.object({
   researchSummary: z.string().optional(),
-  steps: z
-    .array(
-      z.object({
-        title: z.string(),
-        description: z.string(),
-        hints: z.array(z.string()).optional(),
-        complexity: z.enum(["low", "medium", "high"]).optional(),
-      }),
-    )
-    .min(1)
-    .max(15),
+  steps: z.array(planStepSchema).min(1).max(15),
 });
 
 function readOnlyTools(executor: ToolExecutor) {
@@ -101,6 +106,7 @@ const PLAN_INSTRUCTIONS = (codebase: string, hasWeb: boolean) =>
       ? "Web tools are available (web_search/web_crawl/fetch_url). Use only when needed."
       : "Web tools are unavailable (no FIRECRAWL_API_KEY).",
     "Output must match the provided JSON schema.",
+    "Each step needs a title and description; never use `detail` as the field name.",
     "Keep it short: 1–15 steps.",
   ].join("\n");
 
@@ -132,13 +138,23 @@ export async function generatePlan(goal: string) {
 
   const validated = planSchema.parse(result.output);
 
-  const steps:PlanStep[] = validated.steps.map((s , i)=>({
-    id:`step-${i+1}`,
-    title:s.title,
-    description:s.description,
-    hints:s.hints,
-    complexity:s.complexity
-  }));
+  const steps: PlanStep[] = validated.steps.map((s, i) => {
+    const description = s.description ?? s.detail;
+
+    // `planStepSchema` guarantees this. Keeping the guard makes the
+    // normalized application type explicit and protects future edits.
+    if (description === undefined) {
+      throw new Error(`Plan step ${i + 1} has no description.`);
+    }
+
+    return {
+      id: `step-${i + 1}`,
+      title: s.title,
+      description,
+      hints: s.hints,
+      complexity: s.complexity,
+    };
+  });
 
   return {goal , researchSummary:validated.researchSummary , steps}
 }
