@@ -2,7 +2,8 @@ import {select, isCancel} from "@clack/prompts";
 import chalk from "chalk";
 import figlet from "figlet";
 import { runCliMode } from "../modes/cli";
-import { runTelegramMode } from "../modes/ telegram";
+import { runTelegramMode } from "../modes/telegram";
+import { ensureOpenRouterConfig, ensureTelegramConfig } from "../config/runtime";
 
 const BANNER_FONT = 'ANSI Shadow';
 const SHADOW = chalk.hex('#5b4d9e');
@@ -47,9 +48,12 @@ export async function runwakeup() {
     }
 
     if(mode === "cli") {
+        if (!(await ensureOpenRouterConfig())) return;
         await runCliMode()
     }
     else if(mode === "telegram") {
+        if (!(await ensureOpenRouterConfig())) return;
+        if (!(await ensureTelegramConfig())) return;
         await runTelegramMode()
     }
 }

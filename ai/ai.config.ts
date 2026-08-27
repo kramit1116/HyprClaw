@@ -1,9 +1,9 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { requireOpenRouterConfig } from "../config/runtime";
 
 export function getAgentModel() {
-    const provider = createOpenRouter({apiKey:process.env.OPENROUTER_API_KEY});
-    
-    const modelId = process.env.OPENROUTER_DEFAULT_MODEL || "openrouter/free";
+    const { apiKey, modelId } = requireOpenRouterConfig();
+    const provider = createOpenRouter({ apiKey });
 
     return provider(modelId);
 }
